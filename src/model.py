@@ -67,10 +67,11 @@ class PipelineWrapper:
                 Tuple containing outputs from the model and the encoded text.
         """
         encoded_text = self.encode(text)
-        outputs = self.model(
-            **encoded_text,
-            output_attentions=output_attentions
-        )
+        with torch.no_grad():
+            outputs = self.model(
+                **encoded_text,
+                output_attentions=output_attentions
+            )
         return outputs, encoded_text
 
     def mask_predict(
