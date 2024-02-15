@@ -1,6 +1,6 @@
 from transformers import pipeline
 import torch
-
+import streamlit as st
 
 class PipelineWrapper:
     """
@@ -147,3 +147,36 @@ def get_pipeline_wrapper(
     )
 
     return PipelineWrapper(pipe)
+
+
+@st.cache_data
+def get_outputs(
+    input_text: str,
+    model_name: str = 'distilbert-base-uncased'
+) -> dict[str, torch.Tensor]:
+    """
+    Retrieves outputs from a masked language model pipeline given an input text.
+
+    Args:
+        input_text (str): The input text to be processed by the model.
+        model_name (str, optional): The name of the pre-trained language model to use.
+            Defaults to 'distilbert-base-uncased'.
+
+    Returns:
+        dict[str, torch.Tensor]: A dictionary containing the model outputs.
+
+    Note:
+        This function is decorated with `@st.cache_data` to enable caching of the
+        outputs based on the input arguments. Caching allows for efficient reuse
+        of results, reducing computation time for repeated function calls with
+        the same input arguments.
+
+    Raises:
+        RuntimeError: If the specified model name is not available.
+
+    Example:
+        >>> outputs = get_outputs("Hello, how are you?")
+    """
+    pipe = get_pipeline_wrapper(model_name)
+    outputs = pipe.mask_predict(input_text)
+    return outputs
