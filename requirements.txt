@@ -6,3 +6,4 @@ streamlit
 torch
 tqdm
 transformers
+matplotlib
