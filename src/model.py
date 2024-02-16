@@ -96,17 +96,18 @@ class PipelineWrapper:
         input_words = [self.decode(token) for token in encoded_tokens.squeeze()]
         mask_ind = torch.nonzero(
             encoded_tokens == self.mask_token_id,
-            as_tuple=True
+            as_tuple=False
         )
 
-        mask_hidden = outputs['last_hidden_state'][mask_ind]
-        logits = self.clf(mask_hidden)
+        mask_hidden = outputs['last_hidden_state'][mask_ind[:, 0], mask_ind[:, 1]]
+        with torch.no_grad():
+            logits = self.clf(mask_hidden)
 
         probs = logits.softmax(dim=-1)
         top_k_probs, top_k_ind = probs.topk(top_k)
-        top_k_probs = top_k_probs.squeeze()
-        top_k_ind = top_k_ind.squeeze()
-        top_k_words = [self.decode(token) for token in top_k_ind]
+        #top_k_probs = top_k_probs.squeeze()
+        #top_k_ind = top_k_ind.squeeze()
+        top_k_words = [[self.decode(token) for token in row] for row in top_k_ind]
         return {
                 'top_k_words': top_k_words,
                 'top_k_tokens': top_k_ind,
@@ -117,6 +118,7 @@ class PipelineWrapper:
                 }
 
 
+@st.cache_data
 def get_pipeline_wrapper(
         pipeline_name: str = 'distilbert-base-uncased',
         device: str = 'cpu'
@@ -180,3 +182,14 @@ def get_outputs(
     pipe = get_pipeline_wrapper(model_name)
     outputs = pipe.mask_predict(input_text)
     return outputs
+
+
+if __name__ == '__main__':
+    text = "Attention is [MASK] you [MASK]."
+    #text = "Attention is all you need."
+    #text = "Attention is [MASK] you need."
+    #text = "Attention is all you need."
+    pipe = get_pipeline_wrapper()
+    outputs = pipe.mask_predict(text)
+    print(outputs['top_k_words'])
+    print(outputs['top_k_probs'])
