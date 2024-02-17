@@ -6,7 +6,8 @@ This project provides a web application for visualizing attention weights genera
   <img src="src/assets/screen.png" alt="BERT Attention Visualization" width="600"/>
 </div>
 
-
+## Live Demo
+**App at Streamlit Community Cloud:** https://bertattentionviz.streamlit.app/
 
 ## Features
 
@@ -23,7 +24,7 @@ To run the application locally, follow these steps:
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/your-username/bert-attention-viz.git
+   git clone https://github.com/insdout/bert-attention-viz.git
    ```
 
 2. Navigate to the project directory:
